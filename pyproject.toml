@@ -1,0 +1,10 @@
+[project]
+name = "minecraft-chatbot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gradio>=5.17.1",
+    "pydantic-ai>=0.0.24",
+]
