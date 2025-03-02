@@ -7,4 +7,5 @@ requires-python = ">=3.12"
 dependencies = [
     "gradio>=5.17.1",
     "pydantic-ai>=0.0.24",
+    "pytest>=8.3.5",
 ]
