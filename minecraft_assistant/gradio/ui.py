@@ -2,6 +2,7 @@ import gradio as gr
 import pandas as pd
 from difflib import get_close_matches
 
+
 # Load the dataset
 file_path = r"C:\Users\harin\Downloads\formated_recipes.csv"
 df = pd.read_csv(file_path, header=None)
