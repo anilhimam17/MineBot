@@ -1,10 +1,11 @@
 import gradio as gr
 import pandas as pd
 from difflib import get_close_matches
+import os
 
 
 # Load the dataset
-file_path = r"C:\Users\harin\Downloads\formated_recipes.csv"
+file_path = os.path.join(os.path.dirname(__file__), "formated_recipes.csv")
 df = pd.read_csv(file_path, header=None)
 
 # Convert dataset into a structured dictionary
