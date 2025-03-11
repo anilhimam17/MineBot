@@ -4,7 +4,7 @@ from typing import ClassVar
 
 
 @dataclass
-class DataStore:
+class GameStateDataStore:
     # Instance Variables
     db_name: str
     conn: sqlite3.Connection = field(init=False)
