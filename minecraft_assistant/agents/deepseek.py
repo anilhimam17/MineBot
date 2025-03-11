@@ -4,8 +4,11 @@ from typing import Union, List
 import pandas as pd
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
+from minecraft_assistant.agents.agent_utils import CraftResponse, GeneralResponse
 
-recipes_dataset = pd.read_csv('../recipes/formated_recipes.csv', header=None)
+
+# Loading the Recipes dataset
+recipes_dataset: pd.DataFrame = pd.read_csv('./assets/formatted_recipes.csv', header=None)
 recipes_dataset.iloc[:, 0] = recipes_dataset.iloc[:, 0].str.lower()
 recipes_items = set(recipes_dataset.iloc[:, 0].values)
 
@@ -30,36 +33,45 @@ def display_crafting_table(items):
             print(" | ".join(row))
 
 
-def extract_crafted_items(sentence):
-    pattern = re.compile(
-        r"(?:make|making|made|create|creating|created|build|building|built|craft|crafting|crafted|construct"
-        r"|constructing|constructed|get|getting|got|obtain|obtaining|obtained|brew|brewing|brewed|forge|forging"
-        r"|forged)\s+(?:a|an|some)?\s*(.+?)(?:\?|\.|$)|recipes? of\s+(.+?)(?:\?|\.|$)")
-    match = pattern.search(sentence.lower())
-    item = None
+def is_craft_query(self, user_query: str) -> bool:
+    """Identifying crafting queries apart from general queries providing context."""
+
+    # Raw string for all crafting verbs
+    craft_verbs = (
+        r"(?:"
+        r"make|making|made|"
+        r"create|creating|created|"
+        r"build|building|built|"
+        r"craft|crafting|crafted|"
+        r"construct|constructing|constructed|"
+        r"get|getting|got|"
+        r"obtain|obtaining|obtained|"
+        r"brew|brewing|brewed|"
+        r"forge|forging|forged"
+        r")"
+    )
+
+    # Raw string for quantity
+    articles = r"(?:a|an|some)?"
+
+    # Item pattern search raw string
+    item_pattern = fr"{craft_verbs}\s+{articles}\s*(.+?)(?:\?|\.|$)"
+
+    # Recipe pattern search raw string
+    recipe_pattern = r"recipes? of \s+(.+?)(?:\?|\.|$)"
+
+    # Compiled Regular Expression
+    query_pattern = re.compile(f"{item_pattern} | {recipe_pattern}")
+
+    # Regex Search
+    match = query_pattern.search(user_query.lower())
+
     if match:
-        item = next((group for group in match.groups() if group), None)
-    return item
-
-
-class CraftResponse(BaseModel):
-    formula: str
-    # recipe: str
-    recipe: List[List[str]]
-    procedure: str
-
-
-# class Response(BaseModel):
-#     language: str
-#     code: str
-
-
-class GeneralResponse(BaseModel):
-    response: str
+        return True
+    return False
 
 
 class NLPModel:
-
     def __init__(self, model_name, api_key, base_url):
         self.model = OpenAIModel(
             model_name,
@@ -73,8 +85,7 @@ class NLPModel:
 
     def init_prompt(self, prompt):
         if isinstance(prompt, list):
-            for i in prompt:
-                self.system_prompt.append(i)
+            self.system_prompt.extend(i)
         elif isinstance(prompt, str):
             self.system_prompt.append(prompt)
         self.agent = Agent(
@@ -97,7 +108,7 @@ api_key = "sk-ee966d563dba4b84bff8b270c0cd267a"
 url = 'https://api.deepseek.com'
 chatbot = NLPModel(model, api_key, url)
 
-system_prompt = pd.read_csv('init_prompt.csv')
+system_prompt = pd.read_csv('./assets/init_prompt.csv')
 for i in system_prompt.index:
     chatbot.init_prompt(system_prompt.iloc[i]['message'])
 
