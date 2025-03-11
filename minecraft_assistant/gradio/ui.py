@@ -61,6 +61,9 @@ api_key = "sk-ee966d563dba4b84bff8b270c0cd267a"
 url = 'https://api.deepseek.com'
 chatbot = NLPModel(model, api_key, url)
 
+# open source model (first ollama run model)
+# chatbot = NLPModel('llama3.2:latest', 'http://localhost:11434')
+
 # Adding the system prompts
 system_prompt = pd.read_csv('./assets/init_prompt.csv')
 for i in system_prompt.index:
@@ -90,6 +93,7 @@ while True:
     if isinstance(result, CraftResponse):
         print(result.formula)
         display_crafting_table([i for row in result.recipe for i in row])
+        # display_crafting_table(recipe[1:10])
         print(result.procedure)
     elif isinstance(result, GeneralResponse):
         print(result.response)

@@ -3,6 +3,7 @@ from typing import Any, Union
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from minecraft_assistant.agents.agent_utils import CraftResponse, GeneralResponse
+from pydantic_ai.providers.openai import OpenAIProvider
 
 
 def display_crafting_table(items):
@@ -60,24 +61,34 @@ def is_craft_query(user_query: str) -> Any:
 
     item = None
     if match:
-        item= next((group for group in match.groups() if group), None)
+        item = next((group for group in match.groups() if group), None)
     return item
 
-class NLPModel:
-    def __init__(self, model_name, api_key, base_url):
-        self.model = OpenAIModel(
-            model_name,
-            api_key=api_key,
-            base_url=base_url,
 
-        )
+class NLPModel:
+    def __init__(self, model_name, base_url, api_key=None):
+        self.open_source = True if api_key is None else False
         self.agent = None
         self.system_prompt = []
         self.response = ""
 
+        if self.open_source:
+            self.model = OpenAIModel(
+                model_name,
+                provider=OpenAIProvider(base_url='http://localhost:11434/v1')
+
+            )
+        else:
+            self.model = OpenAIModel(
+                model_name,
+                api_key=api_key,
+                base_url=base_url,
+            )
+
     def init_prompt(self, prompt):
         if isinstance(prompt, list):
-            self.system_prompt.extend(i)
+            for i in prompt:
+                self.system_prompt.append(i)
         elif isinstance(prompt, str):
             self.system_prompt.append(prompt)
         self.agent = Agent(
@@ -93,7 +104,6 @@ class NLPModel:
             self.response = self.agent.run_sync(user_input, message_history=self.response.all_messages())
 
         return self.response.data
-
 
 # text example
 # [

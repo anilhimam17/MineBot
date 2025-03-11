@@ -282,3 +282,13 @@ Pumpkin Seeds,Pumpkin,0,0,0,0,0,0,0,0
 Melon Seeds,Melon,0,0,0,0,0,0,0,0
 Gold Nugget,Gold Ingot,0,0,0,0,0,0,0,0
 Emerald,Block of Emerald,0,0,0,0,0,0,0,0
+Sword,Iron Ingot,0,0,Iron Ingot,0,0,Stick,0,0
+Pickaxe,Iron Ingot,Iron Ingot,Iron Ingot,0,Stick,0,0,Stick,0
+Axe,Iron Ingot,Iron Ingot,0,Iron Ingot,Stick,0,0,Stick,0
+Hoe,Iron Ingot,Iron Ingot,0,Stick,0,0,Stick,0,0
+Shovel,Iron Ingot,0,0,Stick,0,0,Stick,0,0
+Helmet,Iron Ingot,Iron Ingot,Iron Ingot,Iron Ingot,0,Iron Ingot,0,0,0
+Chestplate,Iron Ingot,0,Iron Ingot,Iron Ingot,Iron Ingot,Iron Ingot,Iron Ingot,Iron Ingot,Iron Ingot
+Leggings,Iron Ingot,Iron Ingot,Iron Ingot,Iron Ingot,0,Iron Ingot,Iron Ingot,0,Iron Ingot
+Boots,Iron Ingot,0,Iron Ingot,Iron Ingot,0,Iron Ingot,0,0,0
+
