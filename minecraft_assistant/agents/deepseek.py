@@ -1,16 +1,8 @@
 import re
-from pydantic import BaseModel
-from typing import Union, List
-import pandas as pd
+from typing import Any, Union
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from minecraft_assistant.agents.agent_utils import CraftResponse, GeneralResponse
-
-
-# Loading the Recipes dataset
-recipes_dataset: pd.DataFrame = pd.read_csv('./assets/formatted_recipes.csv', header=None)
-recipes_dataset.iloc[:, 0] = recipes_dataset.iloc[:, 0].str.lower()
-recipes_items = set(recipes_dataset.iloc[:, 0].values)
 
 
 def display_crafting_table(items):
@@ -33,7 +25,7 @@ def display_crafting_table(items):
             print(" | ".join(row))
 
 
-def is_craft_query(self, user_query: str) -> bool:
+def is_craft_query(user_query: str) -> Any:
     """Identifying crafting queries apart from general queries providing context."""
 
     # Raw string for all crafting verbs
@@ -61,15 +53,15 @@ def is_craft_query(self, user_query: str) -> bool:
     recipe_pattern = r"recipes? of \s+(.+?)(?:\?|\.|$)"
 
     # Compiled Regular Expression
-    query_pattern = re.compile(f"{item_pattern} | {recipe_pattern}")
+    query_pattern = re.compile(f"{item_pattern}|{recipe_pattern}")
 
     # Regex Search
     match = query_pattern.search(user_query.lower())
 
+    item = None
     if match:
-        return True
-    return False
-
+        item= next((group for group in match.groups() if group), None)
+    return item
 
 class NLPModel:
     def __init__(self, model_name, api_key, base_url):
@@ -102,45 +94,6 @@ class NLPModel:
 
         return self.response.data
 
-
-model = 'deepseek-chat'
-api_key = "sk-ee966d563dba4b84bff8b270c0cd267a"
-url = 'https://api.deepseek.com'
-chatbot = NLPModel(model, api_key, url)
-
-system_prompt = pd.read_csv('./assets/init_prompt.csv')
-for i in system_prompt.index:
-    chatbot.init_prompt(system_prompt.iloc[i]['message'])
-
-while True:
-
-    user_input = input("You: ")
-    if user_input.lower() in ["退出", "bye", "exit"]:
-        print("AI: Bye！👋")
-        break
-
-    craft_item = extract_crafted_items(user_input)
-    if craft_item and (craft_item in recipes_items):
-        recipe = recipes_dataset[recipes_dataset.iloc[:, 0] == craft_item].values[0]
-        # print(recipe)
-        # recipe form
-        message = (f"{','.join(recipe[1:10])}. 3 by 3 2D array crafting table based on the above nine elements"
-                   f"from left to right and from top to bottom in sequence, 0 means empty output item is {craft_item}")
-        # simple reply
-        # message = f"{','.join(recipe)}. Crafting based on the above nine elements.{user_input}"
-        # display_crafting_table(recipe)
-        user_input = message
-        # print(message)
-    result = chatbot.chat(user_input)
-    print("AI:", end=" ", flush=True)
-    if isinstance(result, CraftResponse):
-        print(result.formula)
-        # print(result.recipe)  # string recipe
-        # print(*result.recipe, sep="\n")
-        display_crafting_table([i for row in result.recipe for i in row])
-        print(result.procedure)
-    elif isinstance(result, GeneralResponse):
-        print(result.response)
 
 # text example
 # [
