@@ -5,7 +5,7 @@ import os
 
 
 # Load the dataset
-file_path = os.path.join(os.path.dirname(__file__), "formated_recipes.csv")
+file_path = os.path.join(os.getcwd(), "assets", "formatted_recipes.csv")
 df = pd.read_csv(file_path, header=None)
 
 # Convert dataset into a structured dictionary
