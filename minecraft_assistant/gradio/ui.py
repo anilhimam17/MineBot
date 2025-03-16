@@ -6,7 +6,6 @@ from minecraft_assistant.dialogue_space.message_datastore import MessageDataStor
 from minecraft_assistant.agents.deepseek import NLPModel, is_craft_query, display_crafting_table
 from minecraft_assistant.agents.agent_utils import CraftResponse, GeneralResponse
 
-
 # Simulate a database for storing chat history (using MessageDataStore)
 class ChatDatabase:
     def __init__(self, filename="./logs/chat_history.json"):
@@ -19,36 +18,22 @@ class ChatDatabase:
         self.save_chat_history()
 
     def get_chat_history(self):
-        return self.chat_history.message_store
+        return "\n".join(self.chat_history.message_store)
 
     def save_chat_history(self):
-        # Save chat history to a JSON file
         with open(self.filename, "w") as f:
             json.dump(self.chat_history.message_store, f, indent=4)
 
     def load_chat_history(self):
-        # Load chat history from a JSON file (if it exists)
         if os.path.exists(self.filename):
             with open(self.filename, "r") as f:
                 messages = json.load(f)
                 for message in messages:
                     self.chat_history.add_message(message)
-        else:
-            return []
-
-    def display_chat_history(self):
-        # Load chat history from a JSON file (if it exists)
-        if os.path.exists(self.filename):
-            with open(self.filename, "r") as f:
-                messages = json.load(f)
-                for message in messages:
-                    print(message)
-        else:
-            return ModuleNotFoundError("Could not find the file")
-
 
 # Initialize the in-memory database
 chat_db = ChatDatabase()
+chat_db.load_chat_history()
 
 # Loading the Recipe Dataset
 recipes_dataset: pd.DataFrame = pd.read_csv('./assets/formatted_recipes.csv', header=None)
@@ -61,48 +46,39 @@ api_key = "sk-ee966d563dba4b84bff8b270c0cd267a"
 url = 'https://api.deepseek.com'
 chatbot = NLPModel(model, api_key, url)
 
-# open source model (first ollama run model)
-# chatbot = NLPModel('llama3.2:latest', 'http://localhost:11434')
-
-# Adding the system prompts
+# Load system prompts
 system_prompt = pd.read_csv('./assets/init_prompt.csv')
 for i in system_prompt.index:
     chatbot.init_prompt(system_prompt.iloc[i]['message'])
 
-while True:
-    user_input = input("You: ")
+def chat_with_ai(user_input):
     if user_input.lower() in ["退出", "bye", "exit"]:
-        print("AI: Bye！👋")
-        break
-
-    # Checking for a Crafting Query
+        return "AI: Bye！👋"
+    
     craft_item = is_craft_query(user_input)
-    print(craft_item)
     if craft_item and (craft_item in recipes_items):
         recipe = recipes_dataset[recipes_dataset.iloc[:, 0] == craft_item].values[0]
-
         message = (
-            f"{",".join(recipe[1:10])}. 3 by 3 2D array crafting table based on the above nine elements"
-            f"from left to right and from top to bottom in sequence, 0 means empty output item is {craft_item}"
+            f"{','.join(recipe[1:10])}. 3 by 3 2D array crafting table based on the above nine elements "
+            f"from left to right and from top to bottom in sequence, 0 means empty. Output item is {craft_item}"
         )
     else:
         message = user_input
+    
     result = chatbot.chat(user_input)
-
-    print("AI:", end=" ", flush=True)
+    
     if isinstance(result, CraftResponse):
-        print(result.formula)
-        display_crafting_table([i for row in result.recipe for i in row])
-        # display_crafting_table(recipe[1:10])
-        print(result.procedure)
+        response = f"{result.formula}\n{result.procedure}"
     elif isinstance(result, GeneralResponse):
-        print(result.response)
+        response = result.response
+    else:
+        response = "I'm not sure how to respond to that."
+    
+    chat_db.add_message(user_input, response)
+    return response
 
-    # Taking logs of the message.
-    chat_db.add_message(user_input, result)
-
-else:
-    chat_db.display_chat_history()
+giface = gr.Interface(fn=chat_with_ai, inputs="text", outputs="text", title="Minecraft Assistant Chatbot")
+giface.launch()
 
 
 # # Create a Gradio chat interface
