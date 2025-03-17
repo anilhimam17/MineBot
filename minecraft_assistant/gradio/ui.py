@@ -6,6 +6,7 @@ from minecraft_assistant.dialogue_space.message_datastore import MessageDataStor
 from minecraft_assistant.agents.deepseek import NLPModel, is_craft_query, display_crafting_table
 from minecraft_assistant.agents.agent_utils import CraftResponse, GeneralResponse
 
+
 # Simulate a database for storing chat history (using MessageDataStore)
 class ChatDatabase:
     def __init__(self, filename="./logs/chat_history.json"):
@@ -31,6 +32,7 @@ class ChatDatabase:
                 for message in messages:
                     self.chat_history.add_message(message)
 
+
 # Initialize the in-memory database
 chat_db = ChatDatabase()
 chat_db.load_chat_history()
@@ -51,34 +53,43 @@ system_prompt = pd.read_csv('./assets/init_prompt.csv')
 for i in system_prompt.index:
     chatbot.init_prompt(system_prompt.iloc[i]['message'])
 
-def chat_with_ai(user_input):
-    if user_input.lower() in ["退出", "bye", "exit"]:
-        return "AI: Bye！👋"
-    
-    craft_item = is_craft_query(user_input)
-    if craft_item and (craft_item in recipes_items):
-        recipe = recipes_dataset[recipes_dataset.iloc[:, 0] == craft_item].values[0]
-        message = (
-            f"{','.join(recipe[1:10])}. 3 by 3 2D array crafting table based on the above nine elements "
-            f"from left to right and from top to bottom in sequence, 0 means empty. Output item is {craft_item}"
-        )
-    else:
-        message = user_input
-    
-    result = chatbot.chat(user_input)
-    
-    if isinstance(result, CraftResponse):
-        response = f"{result.formula}\n{result.procedure}"
-    elif isinstance(result, GeneralResponse):
-        response = result.response
-    else:
-        response = "I'm not sure how to respond to that."
-    
-    chat_db.add_message(user_input, response)
-    return response
 
-giface = gr.Interface(fn=chat_with_ai, inputs="text", outputs="text", title="Minecraft Assistant Chatbot")
-giface.launch()
+def chat_with_ai():
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["退出", "bye", "exit"]:
+            print("AI: Bye！👋")
+            break
+
+        craft_item = is_craft_query(user_input)
+        if craft_item and (craft_item in recipes_items):
+            recipe = recipes_dataset[recipes_dataset.iloc[:, 0] == craft_item].values[0]
+            message = (
+                f"{','.join(recipe[1:10])}. 3 by 3 2D array crafting table based on the above nine elements "
+                f"from left to right and from top to bottom in sequence, 0 means empty. Output item is {craft_item}"
+            )
+        else:
+            message = user_input
+
+        result = chatbot.chat(message)
+
+        if isinstance(result, CraftResponse):
+            response = f"{result.formula}\n{result.procedure}"
+        elif isinstance(result, GeneralResponse):
+            response = result.response
+        else:
+            response = "I'm not sure how to respond to that."
+
+        chat_db.add_message(user_input, response)
+
+        print(response)
+
+
+# Chatting with AI
+chat_with_ai()
+
+# giface = gr.Interface(fn=chat_with_ai, inputs="text", outputs="text", title="Minecraft Assistant Chatbot")
+# giface.launch()
 
 
 # # Create a Gradio chat interface
@@ -115,7 +126,7 @@ giface.launch()
 #     chat_history = gr.State()  # state for keeping track of chat
 #     chatbot = gr.Chatbot()  # Instantiate Chatbot directly
 #     textbox = gr.Textbox(placeholder="Ask me about a crafting recipe...", lines=1)
-    
+
 #     textbox.submit(gradio_chatbot, [textbox, chat_history], [chat_history, chatbot])
 #     generate_script_button = gr.Button("Generate Script")
 #     generate_script_button.click(generate_script)

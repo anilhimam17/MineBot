@@ -1,8 +1,6 @@
 [
-    "User: heya, do you know about minecraft ?",
-    "Bot: response=\"Yes, I know about Minecraft! It's a sandbox game where you can build, explore, and survive in a blocky, procedurally-generated 3D world. Do you need more information about anything specific in Minecraft?\"",
-    "User: How to craft a nether portal ?",
-    "Bot: formula='10 Obsidian = 1 Nether Portal' recipe=[['Obsidian', 'Obsidian', 'Obsidian'], ['Obsidian', '', 'Obsidian'], ['Obsidian', '', 'Obsidian'], ['Obsidian', 'Obsidian', 'Obsidian']] procedure='1. Gather 10 Obsidian blocks. 2. Arrange the Obsidian blocks in a 4x5 rectangle frame. 3. Use a Flint and Steel to ignite the portal. 4. The Nether Portal will activate, allowing you to travel to the Nether.'",
-    "User: How to craft a pickaxe ?",
-    "Bot: formula='3 Wooden Planks + 2 Sticks = 1 Wooden Pickaxe' recipe=[['Wooden Plank', 'Wooden Plank', 'Wooden Plank'], ['', 'Stick', ''], ['', 'Stick', '']] procedure='1. Open the crafting table. 2. Place 3 Wooden Planks in the top row. 3. Place 1 Stick in the middle of the second row and 1 Stick in the middle of the third row. 4. Drag the Wooden Pickaxe to your inventory.'"
+    "User: Heya, describe yourself ?",
+    "Bot: response='I am a Minecraft assistant here to help you with all your Minecraft-related questions. Whether you need crafting recipes, tips for survival, or building ideas, I\u2019ve got you covered. Let me know how I can assist you!'",
+    "User: heya, describe yourself.",
+    "Bot: I am a Minecraft assistant here to help you with all things related to Minecraft. I can provide crafting recipes, game tips, and answer your questions about the game. Let me know how I can assist you!"
 ]

@@ -66,29 +66,19 @@ def is_craft_query(user_query: str) -> Any:
 
 
 class NLPModel:
-    def __init__(self, model_name, base_url, api_key=None):
-        self.open_source = True if api_key is None else False
+    def __init__(self, model_name, api_key, base_url):
+        self.model = OpenAIModel(
+            model_name,
+            api_key=api_key,
+            base_url=base_url,
+        )
         self.agent = None
         self.system_prompt = []
         self.response = ""
 
-        if self.open_source:
-            self.model = OpenAIModel(
-                model_name,
-                provider=OpenAIProvider(base_url='http://localhost:11434/v1')
-
-            )
-        else:
-            self.model = OpenAIModel(
-                model_name,
-                api_key=api_key,
-                base_url=base_url,
-            )
-
     def init_prompt(self, prompt):
         if isinstance(prompt, list):
-            for i in prompt:
-                self.system_prompt.append(i)
+            self.system_prompt.extend(prompt)
         elif isinstance(prompt, str):
             self.system_prompt.append(prompt)
         self.agent = Agent(
