@@ -53,7 +53,6 @@ system_prompt = pd.read_csv('./assets/init_prompt.csv')
 for i in system_prompt.index:
     chatbot.init_prompt(system_prompt.iloc[i]['message'])
 
-
 def chat_with_ai(user_input, history):
     history = history or []
     
