@@ -2,5 +2,9 @@
     "User: Heya, describe yourself ?",
     "Bot: response='I am a Minecraft assistant here to help you with all your Minecraft-related questions. Whether you need crafting recipes, tips for survival, or building ideas, I\u2019ve got you covered. Let me know how I can assist you!'",
     "User: heya, describe yourself.",
-    "Bot: I am a Minecraft assistant here to help you with all things related to Minecraft. I can provide crafting recipes, game tips, and answer your questions about the game. Let me know how I can assist you!"
+    "Bot: I am a Minecraft assistant here to help you with all things related to Minecraft. I can provide crafting recipes, game tips, and answer your questions about the game. Let me know how I can assist you!",
+    "User: Hello",
+    "Bot: Hello! How can I assist you with Minecraft today? Do you need help with crafting, building, or something else?",
+    "User: by",
+    "Bot: I'm here to help with Minecraft. Do you need help with crafting, building, or something else?"
 ]

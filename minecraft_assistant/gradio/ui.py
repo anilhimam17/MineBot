@@ -88,6 +88,49 @@ def chat_with_ai():
 # Chatting with AI
 chat_with_ai()
 
+
+def chat_with_ai(user_input):
+    """Takes input from the UI, processes it, and prints the output in the terminal."""
+    if user_input.lower() in ["退出", "bye", "exit"]:
+        print("AI: Bye！👋")
+        return ""
+
+    craft_item = is_craft_query(user_input)
+
+    if craft_item and (craft_item in recipes_items):
+        recipe = recipes_dataset[recipes_dataset.iloc[:, 0] == craft_item].values[0]
+        message = (
+            f"{','.join(recipe[1:10])}. 3 by 3 2D array crafting table based on the above nine elements "
+            f"from left to right and from top to bottom in sequence, 0 means empty. Output item is {craft_item}"
+        )
+    else:
+        message = user_input
+
+    result = chatbot.chat(user_input)
+
+    print("You:", user_input)
+    print("AI:", end=" ", flush=True)
+
+    if isinstance(result, CraftResponse):
+        print(result.formula)
+        display_crafting_table([i for row in result.recipe for i in row])
+        print(result.procedure)
+    elif isinstance(result, GeneralResponse):
+        print(result.response)
+
+    chat_db.add_message(user_input, result)
+    return ""  # Empty return to prevent Gradio from displaying output
+
+# Gradio UI for input
+giface = gr.Interface(
+    fn=chat_with_ai,
+    inputs="text",
+    outputs="text",  # Empty text since output is in the terminal
+    title="Minecraft Assistant (Terminal Output)"
+)
+
+giface.launch()
+
 # giface = gr.Interface(fn=chat_with_ai, inputs="text", outputs="text", title="Minecraft Assistant Chatbot")
 # giface.launch()
 
