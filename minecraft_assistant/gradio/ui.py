@@ -97,7 +97,9 @@ with block:
     chatbot_ui = gr.Chatbot()
     message = gr.Textbox(placeholder="Type your message here...")
     state = gr.State()
-    submit = gr.Button("SEND")
-    submit.click(chat_with_ai, inputs=[message, state], outputs=[chatbot_ui, state])
+
+    # Process input when pressing Enter
+    message.submit(chat_with_ai, inputs=[message, state], outputs=[chatbot_ui, state])
 
 block.launch(debug=True)
+
