@@ -2,6 +2,7 @@ import gradio as gr
 import pandas as pd
 import os
 import json
+import speech_recognition as sr
 from minecraft_assistant.dialogue_space.message_datastore import MessageDataStore
 from minecraft_assistant.agents.deepseek import NLPModel, is_craft_query, display_crafting_table
 from minecraft_assistant.agents.agent_utils import CraftResponse, GeneralResponse
@@ -53,6 +54,21 @@ system_prompt = pd.read_csv('./assets/init_prompt.csv')
 for i in system_prompt.index:
     chatbot.init_prompt(system_prompt.iloc[i]['message'])
 
+
+# Function to convert speech to text
+def speech_to_text(audio):
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(audio) as sources:
+        audio_data = recognizer.record(sources)
+        try:
+            text = recognizer.recognize_google(audio_data)
+            return text
+        except sr.UnknownValueError:
+            return "Sorry, I could not understand the audio."
+        except sr.RequestError:
+            return "Sorry, there was an issue with the speech recognition service."
+
+
 def chat_with_ai(user_input, history):
     history = history or []
     
@@ -98,8 +114,11 @@ with block:
     message = gr.Textbox(placeholder="Type your message here...")
     state = gr.State()
 
+    # Add microphone button for voice input
+    mic = gr.Audio(sources=["microphone"], type="filepath", label="Speak your message")
+    mic.change(speech_to_text, inputs=mic, outputs=message)
+
     # Process input when pressing Enter
     message.submit(chat_with_ai, inputs=[message, state], outputs=[chatbot_ui, state])
 
 block.launch(debug=True)
-
