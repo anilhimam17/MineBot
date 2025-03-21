@@ -7,7 +7,6 @@ from minecraft_assistant.dialogue_space.message_datastore import MessageDataStor
 from minecraft_assistant.agents.deepseek import NLPModel, is_craft_query, display_crafting_table
 from minecraft_assistant.agents.agent_utils import CraftResponse, GeneralResponse
 
-
 # Simulate a database for storing chat history (using MessageDataStore)
 class ChatDatabase:
     def __init__(self, filename="./logs/chat_history.json"):
@@ -62,6 +61,7 @@ def speech_to_text(audio):
         audio_data = recognizer.record(sources)
         try:
             text = recognizer.recognize_google(audio_data)
+            print(f"Converted text: {text}")  # Debugging
             return text
         except sr.UnknownValueError:
             return "Sorry, I could not understand the audio."
@@ -69,6 +69,7 @@ def speech_to_text(audio):
             return "Sorry, there was an issue with the speech recognition service."
 
 
+# Function to process user input and generate a response
 def chat_with_ai(user_input, history):
     history = history or []
     
@@ -105,6 +106,19 @@ def chat_with_ai(user_input, history):
     return history, history
 
 
+# Function to handle audio input
+def process_audio(audio):
+    if audio is None:
+        return "No audio file received."
+    
+    text = speech_to_text(audio)
+    if text and text not in ["Sorry, I could not understand the audio.", "Sorry, there was an issue with the speech recognition service."]:
+        # Pass the converted text to the chatbot
+        history, _ = chat_with_ai(text, None)
+        return history  # Return the updated chat history
+    return "Sorry, I could not process the audio."
+
+
 # Gradio Interface
 block = gr.Blocks()
 
@@ -116,7 +130,7 @@ with block:
 
     # Add microphone button for voice input
     mic = gr.Audio(sources=["microphone"], type="filepath", label="Speak your message")
-    mic.change(speech_to_text, inputs=mic, outputs=message)
+    mic.change(process_audio, inputs=mic, outputs=chatbot_ui)
 
     # Process input when pressing Enter
     message.submit(chat_with_ai, inputs=[message, state], outputs=[chatbot_ui, state])
