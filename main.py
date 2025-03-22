@@ -1,6 +1,12 @@
+from application import MinecraftAssistantApplication
+
+
 def main():
-    print("Hello from minecraft-chatbot!")
+    """Minecraft assistant application driver."""
+    app = MinecraftAssistantApplication()
+    app.run()
 
 
+# Driver code to start the application
 if __name__ == "__main__":
     main()
