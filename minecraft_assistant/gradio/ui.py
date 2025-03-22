@@ -106,7 +106,7 @@ def chat_with_ai(user_input, history):
     return history, history
 
 
-# Function to handle audio input
+# Function to handle audio input and automatically send to chatbot
 def process_audio(audio):
     if audio is None:
         return "No audio file received."
@@ -125,14 +125,14 @@ block = gr.Blocks()
 with block:
     gr.Markdown("""<h1><center>Minecraft Assistant Chatbot</center></h1>""")
     chatbot_ui = gr.Chatbot()
-    message = gr.Textbox(placeholder="Type your message here...")
+    message = gr.Textbox(placeholder="Type your message here...")  # Keep the textbox visible
     state = gr.State()
 
     # Add microphone button for voice input
     mic = gr.Audio(sources=["microphone"], type="filepath", label="Speak your message")
     mic.change(process_audio, inputs=mic, outputs=chatbot_ui)
 
-    # Process input when pressing Enter
+    # Process input when pressing Enter (for text input)
     message.submit(chat_with_ai, inputs=[message, state], outputs=[chatbot_ui, state])
 
 block.launch(debug=True)
