@@ -1,17 +1,16 @@
-from pydantic import BaseModel
+from typing import Literal
+from pydantic import BaseModel, Field
 
 
 class CraftResponse(BaseModel):
     """Structure for crafting queries."""
-    formula: str
-    recipe: list[list[str]]
-    procedure: str
+    response_type: Literal["CraftResponse"] = "CraftResponse"
+    formula: str = Field()
+    recipe: list[list[str]] = Field()
+    procedure: str = Field()
 
 
 class GeneralResponse(BaseModel):
     """Structure for general game queries."""
-    response: str
-
-
-# Generic result type for different responses
-ResultDepsT = CraftResponse | GeneralResponse
+    response_type: Literal["GeneralResponse"] = "GeneralResponse"
+    response: str = Field()

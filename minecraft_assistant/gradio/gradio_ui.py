@@ -3,7 +3,6 @@ import gradio as gr
 
 class GradioInterface:
     """Class to abstract all the gradio orchestration."""
-
     def __init__(self) -> None:
         self.gradio_block = gr.Blocks()
 
