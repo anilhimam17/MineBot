@@ -17,6 +17,7 @@ class LLMAgent:
 
     def __init__(self, agent_name: str, is_local: bool) -> None:
         self.is_local = is_local
+        self.previous_result = ""
         self.agent_utilities = AgentUtilities()
         system_prompt = self.agent_utilities.load_system_prompts()
 
@@ -48,11 +49,22 @@ class LLMAgent:
     def run_query(self, prompt: str) -> Any:
         """Makes a request to the the AI Agent to generate a response."""
 
-        try:
-            response = self.pydantic_ai_agent.run_sync(prompt)
-            return response.data
-        except Exception as ex:
-            print(f"Attempt failed with: {ex}")
+        if self.previous_result:
+            try:
+                response = self.pydantic_ai_agent.run_sync(
+                    prompt, message_history=self.previous_result.all_messages()
+                )
+                self.previous_result = response
+                return response.data
+            except Exception as ex:
+                print(f"Attempt failed with: {ex}")
+        else:
+            try:
+                response = self.pydantic_ai_agent.run_sync(prompt)
+                self.previous_result = response
+                return response.data
+            except Exception as ex:
+                print(f"Attempt failed with: {ex}")
 
     def process_input(self, user_input: str) -> str:
         """Processes the input string from the user and returns a context aware prompt."""

@@ -10,7 +10,7 @@ class AgentUtilities:
     @property
     def recipes_dataset(self) -> pd.DataFrame:
         """Loads the dataset for recipes to improves the context of the Agent."""
-        
+
         recipes_df = pd.read_csv(PATH_RECIPES_DATASET, header=None)
         recipes_df.iloc[:, 0] = recipes_df.iloc[:, 0].str.lower()
         return recipes_df

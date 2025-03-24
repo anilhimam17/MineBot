@@ -14,3 +14,8 @@ class GeneralResponse(BaseModel):
     """Structure for general game queries."""
     response_type: Literal["GeneralResponse"] = "GeneralResponse"
     response: str = Field()
+
+
+class GameStateResponse(BaseModel):
+    """Structure for responses on providing game states."""
+    # TODO

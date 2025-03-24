@@ -4,8 +4,8 @@ from minecraft_assistant.agents.llm_agent import LLMAgent
 
 
 # Variables to construct the agent
-AGENT_NAME = "qwen2.5-coder:14b"
-IS_LOCAL = True
+AGENT_NAME = "deepseek-chat"
+IS_LOCAL = False
 
 
 class GradioInterface:
