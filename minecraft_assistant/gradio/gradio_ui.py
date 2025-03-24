@@ -1,10 +1,18 @@
 import gradio as gr
 
+from minecraft_assistant.agents.llm_agent import LLMAgent
+
+
+# Variables to construct the agent
+AGENT_NAME = "qwen2.5-coder:14b"
+IS_LOCAL = True
+
 
 class GradioInterface:
     """Class to abstract all the gradio orchestration."""
     def __init__(self) -> None:
         self.gradio_block = gr.Blocks()
+        self.llm_agent = LLMAgent(AGENT_NAME, IS_LOCAL)
 
     def run(self) -> None:
         """Build and run the gradio interface on localhost."""
@@ -16,19 +24,18 @@ class GradioInterface:
 
             chatbot_ui = gr.Chatbot()
             message_box = gr.Textbox("Let's cookup some minecraft")
-            state = gr.State()
 
             # Voice interface declaration
-            mic = gr.Audio(
-                sources=["microphone"], type="filepath", label="Wanna, start a Chat ?"
-            )
+            # mic = gr.Audio(
+            #     sources=["microphone"], type="filepath", label="Wanna, start a Chat ?"
+            # )
 
-            # Microphone pipeline
-            mic.change(process_audio, inputs=mic, outputs=chatbot_ui)
+            # # Microphone pipeline
+            # mic.change(process_audio, inputs=mic, outputs=chatbot_ui)
 
             # Compiling the entire pipeline for the input / output
             _ = message_box.submit(
-                TODO, inputs=[message_box, state], outputs=[chatbot_ui, state]
+                self.llm_agent.run_pipeline, inputs=[message_box], outputs=[chatbot_ui]
             )
 
         _ = self.gradio_block.launch(debug=True)
