@@ -1,7 +1,7 @@
 from typing import Annotated, Any
 from pydantic import Field
 from pydantic_ai import Agent
-from minecraft_assistant.agents.agent_types import CraftResponse, GeneralResponse
+from minecraft_assistant.agents.agent_types import CraftResponse, GameStateResponse, GeneralResponse
 from minecraft_assistant.agents.agent_utils import AgentUtilities
 
 from pydantic_ai.models.openai import OpenAIModel
@@ -9,7 +9,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 
 
 # Generic Datatype that is returned by the models
-ResultDepsT = Annotated[CraftResponse | GeneralResponse, Field(discriminator="response_type")]
+ResultDepsT = Annotated[CraftResponse | GeneralResponse | GameStateResponse, Field(discriminator="response_type")]
 
 
 class LLMAgent:

@@ -1,5 +1,4 @@
 import re
-from typing import Any
 import pandas as pd
 
 from minecraft_assistant.agents.agent_types import GameStateEvent
