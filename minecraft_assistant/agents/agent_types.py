@@ -18,4 +18,28 @@ class GeneralResponse(BaseModel):
 
 class GameStateResponse(BaseModel):
     """Structure for responses on providing game states."""
-    # TODO
+    response_type: Literal["GameStateResponse"] = "GameStateResponse"
+    response: str = Field()
+
+
+class GameStateEvent(BaseModel):
+    """Structure for recording game state events."""
+
+    date: str = Field(..., alias="Date")
+    time: str = Field(..., alias="Time")
+    player_name: str = Field(..., alias="Player Name")
+    action: str = Field(..., alias="Action")
+    x_coord: int = Field(..., alias="X Coordinate")
+    y_coord: int = Field(..., alias="Y Coordinate")
+    z_coord: int = Field(..., alias="Z Coordinate")
+    dimension: str = Field(..., alias="Dimension")
+    x2_coord: str = Field("", alias="X Coordinate 2")
+    y2_coord: str = Field("", alias="Y Coordinate 2")
+    z2_coord: str = Field("", alias="Z Coordinate 2")
+    dimension2: str = Field("", alias="Dimension 2")
+    detail1: str = Field("", alias="Detail 1")
+    detail2: str = Field("", alias="Detail 2")
+
+    class Config:
+        allow_population_by_field_name = True
+

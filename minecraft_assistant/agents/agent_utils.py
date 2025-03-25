@@ -1,9 +1,14 @@
 import re
+from typing import Any
 import pandas as pd
 
+from minecraft_assistant.agents.agent_types import GameStateEvent
 
+
+PATH_GAME_STATE_DATASET = "./assets/game_states.csv"
 PATH_RECIPES_DATASET = "./assets/formatted_recipes.csv"
-PATH_SYSTEM_PROMPTS_DATASET = "./assets/system_prompts.csv"
+PATH_SYSTEM_PROMPTS_DATASET_OPEN = "./assets/system_prompts_open.csv"
+PATH_SYSTEM_PROMPTS_DATASET_CLOSED = "./assets/system_prompts_closed.csv"
 
 
 class AgentUtilities:
@@ -21,10 +26,60 @@ class AgentUtilities:
 
         return set(self.recipes_dataset.iloc[:, 0].values)
 
-    def load_system_prompts(self) -> str:
+    def load_game_state_events(self) -> list:
+        """Loads the game state events in real-time"""
+        # Define conversion functions for integer fields.
+        def to_int(val: str) -> int:
+            try:
+                # Remove any spaces and check if value is a digit (allow negative sign)
+                val = val.strip()
+                if val.lstrip('-').isdigit():
+                    return int(val)
+                # You can add more specific conversions here if needed.
+            except Exception:
+                pass
+            # Return zero if conversion fails
+            return 0
+
+        # Define converters for relevant columns.
+        converters = {
+            "X Coordinate": to_int,
+            "Y Coordinate": to_int,
+            "Z Coordinate": to_int,
+            # If the secondary coordinate columns are expected as strings, leave them, or add similar converters.
+            "X Coordinate 2": lambda x: x if isinstance(x, str) and x != "-" else "",
+            "Y Coordinate 2": lambda x: x if isinstance(x, str) and x != "-" else "",
+            "Z Coordinate 2": lambda x: x if isinstance(x, str) and x != "-" else "",
+            # For detail fields, replace nan or "-" with an empty string.
+            "Detail 1": lambda x: x if x not in [None, "nan", "-"] else "",
+            "Detail 2": lambda x: x if x not in [None, "nan", "-"] else "",
+        }
+
+        game_state_df = pd.read_csv(PATH_GAME_STATE_DATASET, converters=converters, on_bad_lines="skip")
+
+        events = []
+        for index, row in game_state_df.iterrows():
+            # Convert pandas NaN to an empty string for string fields.
+            row_dict = row.to_dict()
+            for key, value in row_dict.items():
+                if pd.isna(value):
+                    row_dict[key] = ""
+            try:
+                # Validate using the GameStateEvent model.
+                event = GameStateEvent.model_validate(row_dict)
+                events.append(event)
+            except Exception as ex:
+                print(f"Error failed with: {ex} for index {index}")
+        return events
+
+    def load_system_prompts(self, is_local: bool) -> str:
         """Loads all the system prompts used by the agents."""
 
-        sys_prompts_df: pd.DataFrame = pd.read_csv(PATH_SYSTEM_PROMPTS_DATASET)
+        if is_local:
+            sys_prompts_df: pd.DataFrame = pd.read_csv(PATH_SYSTEM_PROMPTS_DATASET_OPEN)
+        else:
+            sys_prompts_df: pd.DataFrame = pd.read_csv(PATH_SYSTEM_PROMPTS_DATASET_CLOSED)
+
         systems_prompts: list[str] = [sys_prompts_df.iloc[i]["message"] for i in sys_prompts_df.index]
         entire_prompt = " ".join(systems_prompts)
 

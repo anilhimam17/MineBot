@@ -19,7 +19,7 @@ class LLMAgent:
         self.is_local = is_local
         self.previous_result = ""
         self.agent_utilities = AgentUtilities()
-        system_prompt = self.agent_utilities.load_system_prompts()
+        system_prompt = self.agent_utilities.load_system_prompts(self.is_local)
 
         if self.is_local:
             ollama_agent = OpenAIModel(
@@ -106,7 +106,7 @@ class LLMAgent:
             # Constructing the display grid for the recipe
             recipe_str = "\n".join([" | ".join(row) for row in recipe])
             return f"Formula:\n{formula}\n\nRecipe:\n{recipe_str}\n\nProcedure:\n{procedure}"
-        elif response_type == "GeneralResponse":
+        elif response_type in ["GeneralResponse", "GameStateResponse"]:
             return result.response
         else:
             return str(result)
@@ -114,11 +114,33 @@ class LLMAgent:
     def run_pipeline(self, user_input: str) -> list[tuple[str, str]]:
         """Compiles the entire pipeline to run a query against the agent."""
 
-        prompt = self.process_input(user_input)
-        result = self.run_query(prompt)
-        output = self.process_output(result)
+        # Loading the Game State events to provide the latest prompt and context of the game
+        events = self.agent_utilities.load_game_state_events()
+        if len(events) > 10:
+            previous_idx = 10
+        else:
+            previous_idx = len(events)
 
-        return [(user_input, output)]
+        event_summary = "Latest events: " + ", ".join([
+            f"""{event.player_name} {event.action} at {event.time} on coordinates
+            ({event.x_coord}, {event.y_coord}, {event.z_coord})""" for event in events[-previous_idx:]
+        ])
+
+        # Loading the user input
+        prompt = self.process_input(user_input)
+
+        # Concatenating the state and prompt to run the query
+        # result_game_state = self.run_query(event_summary)
+
+        final_prompt = prompt + event_summary
+        print(final_prompt)
+        result_user_prompt = self.run_query(final_prompt)
+
+        # output_game_state = self.process_output(result_game_state)
+        output_user_prompt = self.process_output(result_user_prompt)
+        final_output = output_user_prompt
+
+        return [(user_input, final_output)]
 
 
 # Testing
