@@ -1,7 +1,7 @@
 import gradio as gr
-import pyttsx3
-import speech_recognition as sr
+
 from minecraft_assistant.agents.llm_agent import LLMAgent
+from minecraft_assistant.asr_tts.asr import AutomaticSpeechRecognition
 
 
 # Variables to construct the agent
@@ -14,61 +14,21 @@ class GradioInterface:
     def __init__(self) -> None:
         self.gradio_block = gr.Blocks()
         self.llm_agent = LLMAgent(AGENT_NAME, IS_LOCAL)
-        self.recognizer = sr.Recognizer()
-        # self.tts_engine = pyttsx3.init()
-
-        # Configure recognizer settings for better performance
-        self.recognizer.dynamic_energy_threshold = True
-        self.recognizer.pause_threshold = 0.8
-
-    def transcribe_audio(self, audio_file: str) -> str | None:
-        """Implements the speech to the text conversion with error handling."""
-
-        try:
-            with sr.AudioFile(audio_file) as source:
-                self.recognizer.adjust_for_ambient_noise(source, duration=0.5)
-                audio_data = self.recognizer.record(source)
-
-                try:
-                    text = self.recognizer.recognize_google(audio_data)
-                    return text
-                except sr.UnknownValueError:
-                    print("Google Speech Recognition could not understand audio")
-                    return None
-                except sr.RequestError as e:
-                    print(f"Could not request results from Google Speech Recognition service; {e}")
-                    return None
-        except Exception as e:
-            print(f"Error processing audio file: {e}")
-            return None
-
-    def generate_speech(self, text: str) -> str:
-        """Implenets the text to speech (NLG) and saves the audio file"""
-        engine = pyttsx3.init()
-
-        # Configure TTS engine settings
-        _ = engine.setProperty('rate', 150)  # Adjust speech rate
-        _ = engine.setProperty('volume', 1.0)  # Adjust volume
-
-        audio_file = "output_audio.mp3"
-        _ = engine.save_to_file(text, audio_file)
-        _ = engine.runAndWait()
-        _ = engine.stop()
-        return audio_file
+        self.asr = AutomaticSpeechRecognition()
 
     def process_input(self, input_text: str, audio_input: str | None):
         """Process either text or audio input and return the LLM response and speech output."""
 
         if audio_input:
-            transcribed_text = self.transcribe_audio(audio_input)
+            transcribed_text = self.asr.transcribe_audio(audio_input)
             if transcribed_text:
                 response = self.llm_agent.run_pipeline(transcribed_text)
-                return response, self.generate_speech(response)
+                return response, self.asr.generate_speech(response)
             print("Sorry, I couldn't understand the audio input.")
             return None, None
 
         response = self.llm_agent.run_pipeline(input_text)
-        return response, self.generate_speech(response)
+        return response, self.asr.generate_speech(response)
 
     def run(self) -> None:
         """Build and run the Gradio interface with enhanced ASR and TTS capabilities."""
