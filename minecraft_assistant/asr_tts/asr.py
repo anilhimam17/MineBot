@@ -3,6 +3,7 @@ import speech_recognition as sr
 
 
 class AutomaticSpeechRecognition:
+    """Class that implements all the utilities and functions requried for ASR."""
     def __init__(self) -> None:
         self.recognizer = sr.Recognizer()
 
