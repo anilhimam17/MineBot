@@ -1,13 +1,17 @@
+import os
+
 from gtts import gTTS
 import speech_recognition as sr
-import os
 from pydub import AudioSegment
+
 
 ''' To download:
 1.  On macOS: brew install ffmpeg
     On Linux: sudo apt install ffmpe
 2. pip install gTTS pydub speechrecognition gradio
 '''
+
+
 class AutomaticSpeechRecognition:
     def __init__(self) -> None:
         self.recognizer = sr.Recognizer()
@@ -35,15 +39,18 @@ class AutomaticSpeechRecognition:
                 text = " ".join(str(item) for item in text)
             text = str(text).strip()
 
-            raw_filename = f"temp_audio_{os.urandom(4).hex()}.mp3"
+            raw_filename = f"./audio/temp_audio_{os.urandom(4).hex()}.mp3"
             tts = gTTS(text=text, lang='en')
             tts.save(raw_filename)
 
             # Step 2: Load and slightly increase speed (e.g. 1.1x)
             audio = AudioSegment.from_file(raw_filename)
-            faster_audio = audio._spawn(audio.raw_data, overrides={
-                "frame_rate": int(audio.frame_rate * 1.1)
-            }).set_frame_rate(audio.frame_rate)
+            faster_audio = audio._spawn(
+                audio.raw_data,
+                overrides={
+                    "frame_rate": int(audio.frame_rate * 1.1)
+                    }
+                ).set_frame_rate(audio.frame_rate)
 
             # Step 3: Save sped-up version
             final_filename = f"output_audio_{os.urandom(4).hex()}.mp3"
