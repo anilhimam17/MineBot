@@ -1,5 +1,4 @@
 import gradio as gr
-
 from minecraft_assistant.agents.llm_agent import LLMAgent
 from minecraft_assistant.asr_tts.asr import AutomaticSpeechRecognition
 
@@ -7,7 +6,6 @@ from minecraft_assistant.asr_tts.asr import AutomaticSpeechRecognition
 # Variables to construct the agent
 AGENT_NAME = "deepseek-chat"
 IS_LOCAL = False
-
 
 class GradioInterface:
     """Class to abstract all the gradio orchestration."""
@@ -22,13 +20,27 @@ class GradioInterface:
         if audio_input:
             transcribed_text = self.asr.transcribe_audio(audio_input)
             if transcribed_text:
-                response = self.llm_agent.run_pipeline(transcribed_text)
-                return response, self.asr.generate_speech(response)
-            print("Sorry, I couldn't understand the audio input.")
-            return None, None
+                response_tuple = self.llm_agent.run_pipeline(transcribed_text)
 
-        response = self.llm_agent.run_pipeline(input_text)
-        return response, self.asr.generate_speech(response)
+                # Extract the bot response from the tuple
+                bot_response = response_tuple[0][1] if isinstance(response_tuple, list) else response_tuple
+
+                print(f"DEBUG - Bot Response (audio): {bot_response}")
+                speech_file = self.asr.generate_speech(bot_response)
+                return response_tuple, speech_file
+            print("Sorry, I couldn't understand the audio input.")
+            return [], None
+
+        if input_text:
+            response_tuple = self.llm_agent.run_pipeline(input_text)
+
+            bot_response = response_tuple[0][1] if isinstance(response_tuple, list) else response_tuple
+
+            print(f"DEBUG - Bot Response (text): {bot_response}")
+            speech_file = self.asr.generate_speech(bot_response)
+            return response_tuple, speech_file
+
+        return [], None
 
     def run(self) -> None:
         """Build and run the Gradio interface with enhanced ASR and TTS capabilities."""
