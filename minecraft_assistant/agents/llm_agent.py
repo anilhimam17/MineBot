@@ -31,7 +31,7 @@ class LLMAgent:
         else:
             if agent_name == "deepseek-chat":
                 deepseek_agent = OpenAIModel(
-                    agent_name, provider=OpenAIProvider('https://api.deepseek.com', api_key="sk-ee966d563dba4b84bff8b270c0cd267a")
+                    agent_name, provider=OpenAIProvider('https://api.deepseek.com', api_key="your api key")
                 )
                 self.pydantic_ai_agent = Agent(
                     deepseek_agent, system_prompt=system_prompt, result_type=ResultDepsT

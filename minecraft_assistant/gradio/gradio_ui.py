@@ -7,6 +7,7 @@ from minecraft_assistant.asr_tts.asr import AutomaticSpeechRecognition
 AGENT_NAME = "deepseek-chat"
 IS_LOCAL = False
 
+
 class GradioInterface:
     """Class to abstract all the gradio orchestration."""
     def __init__(self) -> None:
