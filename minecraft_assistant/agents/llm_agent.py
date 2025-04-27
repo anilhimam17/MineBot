@@ -132,7 +132,8 @@ class LLMAgent:
         # Concatenating the state and prompt to run the query
         # result_game_state = self.run_query(event_summary)
 
-        final_prompt = prompt + event_summary
+        # + event_summary
+        final_prompt = prompt
         print(final_prompt)
         result_user_prompt = self.run_query(final_prompt)
 
