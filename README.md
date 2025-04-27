@@ -17,7 +17,8 @@ Here is a link to the final paper that contains more information about the proje
 <br><br>
 
 # Demo
-<iframe width="560" height="315" src="https://drive.google.com/file/d/1_W0IVUTOxBK_K3sson6NDWB0lrgiI_W_/view?usp=sharing" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe><br><br>
+Here is a link to the demo: [demo-link](https://drive.google.com/file/d/1_W0IVUTOxBK_K3sson6NDWB0lrgiI_W_/view?usp=sharing)
+<br><br>
 
 # Setup and Feature Toggle
 - **Run Setup:**  
