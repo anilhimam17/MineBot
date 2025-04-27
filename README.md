@@ -92,4 +92,4 @@ By default the game state processing has been disabled as it requires downloadin
 <br><br>
 
 # Acknowledgements
-A big thank you to our supervisor and the that have worked tirelessly to manifest this project. 
+A big thank you to our supervisor and the team that have worked tirelessly to manifest this project. 
